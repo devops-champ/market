@@ -168,8 +168,8 @@ jobs:
       - sonar
 
     if: |
-      inputs.deployment_mode == 'Docker' ||
-      inputs.deployment_mode == 'ArgoCD'
+      inputs.deployment_mode == 'Docker (Push Image)' ||
+      inputs.deployment_mode == 'ArgoCD (Image Deployment)'
 
     env:
       VERSION: ${{ needs.setversion.outputs.new_version }}
@@ -226,8 +226,8 @@ jobs:
       - docker
 
     if: |
-      inputs.deployment_mode == 'Docker' ||
-      inputs.deployment_mode == 'ArgoCD'
+      inputs.deployment_mode == 'Docker (Push Image)' ||
+      inputs.deployment_mode == 'ArgoCD (Image Deployment)'
 
     env:
       VERSION: ${{ needs.setversion.outputs.new_version }}
@@ -270,7 +270,7 @@ jobs:
     needs:
       - setversion
       - deploy
-    if: inputs.deployment_mode == 'ArgoCD'
+    if: inputs.deployment_mode == 'ArgoCD (Image Deployment)'
     env:
       VERSION: ${{ needs.setversion.outputs.new_version }}
     steps:
@@ -383,7 +383,7 @@ jobs:
       - deploy
       - update-gitops
 
-    if: inputs.deployment_mode == 'ArgoCD'
+    if: inputs.deployment_mode == 'ArgoCD (Image Deployment)'
 
     env:
       VERSION: ${{ needs.setversion.outputs.new_version }}
@@ -514,26 +514,17 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
   # ==========================
-  # COMMIT VERSION
+  # COMMIT VERSION (BUILD ONLY)
   # ==========================
 
-  commit-version:
+  commit-version-build:
     runs-on: ubuntu-latest
 
     needs:
+      - setversion
       - sonar
-      - deploy
-      - argocd
 
-    if: |
-      (inputs.deployment_mode == 'Build Only' &&
-        needs.sonar.result == 'success') ||
-
-      (inputs.deployment_mode == 'Docker' &&
-        needs.deploy.result == 'success') ||
-
-      (inputs.deployment_mode == 'ArgoCD' &&
-        needs.argocd.result == 'success')
+    if: inputs.deployment_mode == 'Build Only'
 
     steps:
       - uses: actions/checkout@v5
@@ -553,5 +544,87 @@ jobs:
       - name: Commit Updated Version
         run: |
           git add pom.xml
-          git commit -m "chore: bump version to ${{ needs.setversion.outputs.new_version }}" || true
+
+          git commit \
+            -m "chore: bump version to ${{ needs.setversion.outputs.new_version }}" \
+            || echo "No version changes"
+
+          git push
+
+
+  # ==========================
+  # COMMIT VERSION (DOCKER)
+  # ==========================
+
+  commit-version-docker:
+    runs-on: ubuntu-latest
+
+    needs:
+      - setversion
+      - deploy
+
+    if: inputs.deployment_mode == 'Docker (Push Image)'
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download Updated Pom
+        uses: actions/download-artifact@v5
+        with:
+          name: updated-pom
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+      - name: Commit Updated Version
+        run: |
+          git add pom.xml
+
+          git commit \
+            -m "chore: bump version to ${{ needs.setversion.outputs.new_version }}" \
+            || echo "No version changes"
+
+          git push
+
+
+  # ==========================
+  # COMMIT VERSION (ARGOCD)
+  # ==========================
+
+  commit-version-argocd:
+    runs-on: ubuntu-latest
+
+    needs:
+      - setversion
+      - argocd
+
+    if: inputs.deployment_mode == 'ArgoCD (Image Deployment)'
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download Updated Pom
+        uses: actions/download-artifact@v5
+        with:
+          name: updated-pom
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+      - name: Commit Updated Version
+        run: |
+          git add pom.xml
+
+          git commit \
+            -m "chore: bump version to ${{ needs.setversion.outputs.new_version }}" \
+            || echo "No version changes"
+
           git push

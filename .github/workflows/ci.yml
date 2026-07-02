@@ -417,8 +417,7 @@ jobs:
           argocd app get "${ARGOCD_APP_NAME}" "${ARGOCD_FLAGS[@]}"
 
           argocd app refresh "${ARGOCD_APP_NAME}" \
-            "${ARGOCD_FLAGS[@]}" \
-            --hard
+            "${ARGOCD_FLAGS[@]}"
 
       - name: Wait for ArgoCD Auto Sync
         env:

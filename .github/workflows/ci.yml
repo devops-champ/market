@@ -10,14 +10,14 @@ on:
   workflow_dispatch:
     inputs:
       deployment_mode:
-        description: "Deployment Mode"
+        description: "Deployment Type"
         type: choice
         required: true
         default: "Build Only"
         options:
           - Build Only
-          - Docker
-          - ArgoCD
+          - Docker (Push Image)
+          - ArgoCD (Image Deployment)
 
 jobs:
 

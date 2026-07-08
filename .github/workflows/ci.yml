@@ -614,8 +614,6 @@ jobs:
 
       - name: Commit Updated Version
         run: |
-          git pull --rebase origin main || true
-
           git add pom.xml
 
           if git diff --cached --quiet; then
@@ -623,6 +621,7 @@ jobs:
             exit 0
           fi
 
-          git commit -m "chore: bump version to ${{ needs.setversion.outputs.new_version }}"
+          git commit \
+            -m "chore: bump version to ${{ needs.setversion.outputs.new_version }}"
 
           git push origin main

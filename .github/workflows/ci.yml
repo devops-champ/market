@@ -311,6 +311,7 @@ jobs:
       - setversion
       - deploy
     if: |
+      github.event_name == 'push' ||
       inputs.deployment_mode == 'Docker (Push Image)' ||
       inputs.deployment_mode == 'ArgoCD (Image Deployment)'
     env:

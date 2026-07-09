@@ -15,6 +15,3 @@ spec:
   type: service
   lifecycle: experimental
   owner: group:default/platform-team
-  dependsOn:
-    - resource:default/orders-db
-    - resource:default/kafka-cluster

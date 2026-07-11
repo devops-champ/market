@@ -105,6 +105,19 @@ jobs:
             console.log(`PR #${prs.data[0].number}`);
             core.setOutput("pr", prs.data[0].number);
 
+      - name: Debug PR
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const prs = await github.rest.repos.listPullRequestsAssociatedWithCommit({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              commit_sha: context.sha
+            });
+
+            console.log(JSON.stringify(prs.data[0], null, 2));
+
       - name: Create Check Run
         uses: actions/github-script@v7
         with:

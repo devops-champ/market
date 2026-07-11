@@ -123,39 +123,31 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const prs = await github.rest.repos.listPullRequestsAssociatedWithCommit({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              commit_sha: context.sha
-            });
-
-            const pr = prs.data[0];
-
             const result = await github.rest.checks.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
               name: "🚀 Application Deployment Pipeline",
-
-              // IMPORTANT
-              head_sha: pr.head.sha,
-
+              head_sha: context.sha,
               status: "in_progress",
-
               output: {
                 title: "Deployment Started",
                 summary: `
-            ### Deployment Pipeline
+                  ### Deployment Pipeline
 
-            🟢 Set Version
-            🟡 Build
-            ⏳ Docker
-            ⏳ GitOps
-            ⏳ ArgoCD
-            `
-              }
-            });
+                  🟢 Set Version
 
-            console.log(result.data.id);
+                  🟡 Build
+
+                  ⏳ Docker
+
+                  ⏳ GitOps 
+
+                  ⏳ ArgoCD
+                  `
+                              }
+                            });
+
+                            console.log(result.data.id);
 
   # ==========================
   # CREATE TAG

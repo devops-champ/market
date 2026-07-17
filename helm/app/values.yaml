@@ -2,7 +2,7 @@ replicaCount: 1
 image:
   repository: /market
   pullPolicy: IfNotPresent
-  tag: "0.0.24"
+  tag: "0.0.25"
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""

@@ -4,7 +4,7 @@ metadata:
   name: market
   description: Sample service with CI/CD
   annotations:
-    devlake.io/project-name: devops-champ
+    devlake.io/project-name: market
     github.com/project-slug: devops-champ/market
     backstage.io/techdocs-ref: dir:.
     sonarqube.org/project-key: devops-champ_market
